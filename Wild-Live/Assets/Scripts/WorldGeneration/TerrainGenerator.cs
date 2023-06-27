@@ -12,6 +12,7 @@ public class TerrainGenerator : MonoBehaviour
     private MeshRenderer _renderer = null;
     private Mesh _mesh = null;
     private Vector3[] _verts = null;
+    private Vector2[] _uvs = null;
     #endregion
 
     #region Serialized
@@ -51,6 +52,7 @@ public class TerrainGenerator : MonoBehaviour
     private void GenerateTerrain()
     {
         _verts = new Vector3[_resolution * _resolution];
+        _uvs = new Vector2[_resolution * _resolution];
         //*2 für die Anzahl an Triangles pro Quad
         //*3 für die Anzahl and Indices pro Triangle
         int[] tris = new int[(_resolution - 1) * (_resolution - 1) * 2 * 3];
@@ -67,9 +69,11 @@ public class TerrainGenerator : MonoBehaviour
                 }
 
                 Vector2 percent = new Vector2(x, y) / (_resolution - 1);
+                //Vector2 percent = new Vector2((float)x / (_resolution - 1), (float)y / (_resolution - 1));
                 Vector3 vertPos = startPos + (Vector3.right * percent.x + Vector3.forward * percent.y) * _terrainSize;
 
                 _verts[i] = new Vector3(vertPos.x, n, vertPos.z);
+                _uvs[i] = percent;
 
                 if (x < _resolution - 1 && y < _resolution - 1)
                 {
@@ -87,10 +91,11 @@ public class TerrainGenerator : MonoBehaviour
                 }
             }
         }
-
+        _renderer.sharedMaterial.SetFloat("_Resolution", _resolution);
         _mesh.Clear();
         _mesh.vertices = _verts;
         _mesh.triangles = tris;
+        _mesh.uv = _uvs;
         _mesh.RecalculateNormals();
     }
 
