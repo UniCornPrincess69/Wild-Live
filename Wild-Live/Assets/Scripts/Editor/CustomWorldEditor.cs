@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using TMPro;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
+using Codice.CM.SEIDInfo;
+using Unity.VisualScripting;
 
 public class CustomWorldEditor : EditorWindow
 {
@@ -14,15 +17,10 @@ public class CustomWorldEditor : EditorWindow
     private readonly string[] _toolbar = { "Terrain Settings", "Noise Settings" };
     private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise" };
     private int _toolbarIndex = 0;
-    private int _mapSize = 100;
-    private int _resolution = 20;
     private float _yPosFactor = 0.05f;
-    private Vector3 _position = Vector3.zero;
-    private bool _useNoise = false;
 
-    private object[] values = null;
+    private EditorManager _editorManager;
     #endregion
-
 
 
     #region Rect-Variables
@@ -35,6 +33,14 @@ public class CustomWorldEditor : EditorWindow
     #endregion
 
 
+  
+
+    private void OnEnable()
+    {
+        _editorManager = EditorManager.Instance;
+        _editorManager.WorldEditor = this;
+    }
+
     [MenuItem("Tools/World Editor")]
     public static void DrawWindow()
     {
@@ -42,11 +48,12 @@ public class CustomWorldEditor : EditorWindow
         window.minSize = _minSize;
         window.maxSize = _maxSize;
         window.titleContent = new GUIContent("World Editor");
+        
+        TestLoader.Init();
     }
 
     private void OnGUI()
     {
-        if (values == null) values = new object[] { _mapSize, _resolution, _position, _useNoise };
             
         var windowRect = position;
         
@@ -66,7 +73,7 @@ public class CustomWorldEditor : EditorWindow
             GUILayout.Label("TEST");
         }
         //GUILayout.Label("Terrain Settings", EditorStyles.boldLabel);
-
+        
     }
 
 
@@ -81,19 +88,24 @@ public class CustomWorldEditor : EditorWindow
         var labelPosX = windowRect.width - _fieldWidth;
         var fieldPosX = windowRect.width + _label.width + _fieldWidth;
         var sliderPosX = windowRect.width +_label.width + _field.width;
+        var windowYPos = windowRect.height * _yPosFactor;
 
         //Magic numbers are all tested out factors so the coords fit into the window
-        _label = new Rect(labelPosX * 0.01f, windowRect.height * _yPosFactor, _fieldWidth, _fieldHeight);
-        _field = new Rect(fieldPosX * 0.1f, windowRect.height * _yPosFactor, _fieldWidth, _fieldHeight);
-        _slider = new Rect(sliderPosX * 0.25f, windowRect.height * _yPosFactor, _sliderWidth, _fieldHeight);
+        _label = new Rect(labelPosX * 0.01f, windowYPos, _fieldWidth, _fieldHeight);
+        _field = new Rect(fieldPosX * 0.1f, windowYPos, _fieldWidth, _fieldHeight);
+        _slider = new Rect(sliderPosX * 0.25f, windowYPos, _sliderWidth, _fieldHeight);
 
+        
 
         GUILayout.BeginHorizontal();
         GUI.Label(_label, _settings[0]);
         //TODO: To implement a for loop i need to exchange the variable! Maybe Dict, or something else?!
-        values[0] = (int)EditorGUI.FloatField(_field, (float)values[0]);
-        values[0] = (int)GUI.HorizontalSlider(_slider, (float)values[0], 100f, 1000f);
+        //manager.MapSize = TestLoader.List["Map Size"];
+        _editorManager.MapSize = (int)EditorGUI.FloatField(_field, _editorManager.MapSize);
+        _editorManager.MapSize = (int)GUI.HorizontalSlider(_slider, _editorManager.MapSize, 100f, 1000f);
         GUILayout.EndHorizontal();
+
+        //GUILayout.Toggle
 
     }
 }
