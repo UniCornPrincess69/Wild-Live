@@ -17,6 +17,9 @@ public class TerrainGenerator : MonoBehaviour
 
     #region Serialized
     [SerializeField]
+    private TerrainData _terrainData = null;
+    
+    [SerializeField]
     private SOBool _isNoiseUsed = null;
 
     [SerializeField]
@@ -51,27 +54,30 @@ public class TerrainGenerator : MonoBehaviour
 
     private void GenerateTerrain()
     {
-        var resolution = _resolution.Value;
+        var mapSize = _terrainData.MapSize;
+        var resolution = _terrainData.Resolution;
+        var position = _terrainData.TerrainPosition;
+        var isNoiseUsed = _terrainData.IncludeNoise;
         _verts = new Vector3[resolution * resolution];
         _uvs = new Vector2[resolution * resolution];
         //*2 für die Anzahl an Triangles pro Quad
         //*3 für die Anzahl and Indices pro Triangle
         int[] tris = new int[(resolution - 1) * (resolution - 1) * 2 * 3];
-        Vector3 startPos = (Vector3.left + Vector3.back) * _terrainSize * 0.5f;
+        Vector3 startPos = (Vector3.left + Vector3.back) * mapSize * 0.5f;
         int triIdx = 0;
         for (int y = 0, i = 0; y < resolution; y++)
         {
             for (int x = 0; x < resolution; x++, i++)
             {
                 float n = 0f;
-                if (_isNoiseUsed)
+                if (isNoiseUsed)
                 {
                     n = Mathf.PerlinNoise(x * .3f, y * .3f) * _noiseIntensity;
                 }
 
                 Vector2 percent = new Vector2(x, y) / (resolution - 1);
                 //Vector2 percent = new Vector2((float)x / (_resolution - 1), (float)y / (_resolution - 1));
-                Vector3 vertPos = startPos + (Vector3.right * percent.x + Vector3.forward * percent.y) * _terrainSize;
+                Vector3 vertPos = startPos + (Vector3.right * percent.x + Vector3.forward * percent.y) * mapSize;
 
                 _verts[i] = new Vector3(vertPos.x, n, vertPos.z);
                 _uvs[i] = percent;

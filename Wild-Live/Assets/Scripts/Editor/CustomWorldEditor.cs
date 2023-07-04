@@ -18,6 +18,8 @@ public class CustomWorldEditor : EditorWindow
     private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise" };
     private int _toolbarIndex = 0;
     private float _yPosFactor = 0.05f;
+    private float _fieldOffset = 0f;
+    private TerrainData _terrainData;
 
     private EditorManager _editorManager;
     #endregion
@@ -39,6 +41,7 @@ public class CustomWorldEditor : EditorWindow
     {
         _editorManager = EditorManager.Instance;
         _editorManager.WorldEditor = this;
+        _terrainData = (TerrainData)EditorGUIUtility.Load("Assets/Resources/DefaultTerrain.asset");
     }
 
     [MenuItem("Tools/World Editor")]
@@ -48,8 +51,6 @@ public class CustomWorldEditor : EditorWindow
         window.minSize = _minSize;
         window.maxSize = _maxSize;
         window.titleContent = new GUIContent("World Editor");
-        
-        TestLoader.Init();
     }
 
     private void OnGUI()
@@ -61,12 +62,6 @@ public class CustomWorldEditor : EditorWindow
         if (_toolbarIndex == 0)
         {
             DrawTerrainSettings(windowRect);
-
-            //GUILayout.BeginHorizontal();
-            //GUILayout.Label("Resolution");
-            //_resolution = (int)GUI.HorizontalSlider(new(140, 45, 300, 20), _resolution, 20f, 255f);
-            //_resolution = (int)EditorGUI.FloatField(new(85, 45, 45, 20), _resolution);
-            //GUILayout.EndHorizontal();
         }
         else
         {
@@ -84,28 +79,38 @@ public class CustomWorldEditor : EditorWindow
         //.6f so the field only takes 60% of the window
         _sliderWidth = windowRect.width * 0.6f;
         _fieldHeight = EditorGUIUtility.singleLineHeight;
-
-        var labelPosX = windowRect.width - _fieldWidth;
-        var fieldPosX = windowRect.width + _label.width + _fieldWidth;
-        var sliderPosX = windowRect.width +_label.width + _field.width;
-        var windowYPos = windowRect.height * _yPosFactor;
-
-        //Magic numbers are all tested out factors so the coords fit into the window
-        _label = new Rect(labelPosX * 0.01f, windowYPos, _fieldWidth, _fieldHeight);
-        _field = new Rect(fieldPosX * 0.1f, windowYPos, _fieldWidth, _fieldHeight);
-        _slider = new Rect(sliderPosX * 0.25f, windowYPos, _sliderWidth, _fieldHeight);
-
-        
+        windowRect = GetFieldRects(windowRect);
 
         GUILayout.BeginHorizontal();
         GUI.Label(_label, _settings[0]);
-        //TODO: To implement a for loop i need to exchange the variable! Maybe Dict, or something else?!
-        //manager.MapSize = TestLoader.List["Map Size"];
-        _editorManager.MapSize = (int)EditorGUI.FloatField(_field, _editorManager.MapSize);
-        _editorManager.MapSize = (int)GUI.HorizontalSlider(_slider, _editorManager.MapSize, 100f, 1000f);
+        _terrainData.MapSize = (int)EditorGUI.FloatField(_field, _terrainData.MapSize);
+        _terrainData.MapSize = (int)GUI.HorizontalSlider(_slider, _terrainData.MapSize, 100f, 1000f);
+        GUILayout.EndHorizontal();
+        _fieldOffset += _fieldHeight;
+        windowRect = GetFieldRects(windowRect);
+        GUILayout.BeginHorizontal();
+        GUI.Label(_label, _settings[1]);
+        _terrainData.Resolution = (int)EditorGUI.FloatField(_field, _terrainData.Resolution);
+        _terrainData.Resolution = (int)GUI.HorizontalSlider(_slider, _terrainData.Resolution, 100f, 1000f);
         GUILayout.EndHorizontal();
 
         //GUILayout.Toggle
 
+        GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain");
+        _fieldOffset = 0f;
+    }
+
+    private Rect GetFieldRects(Rect windowRect)
+    {
+        var labelPosX = windowRect.width - _fieldWidth;
+        var fieldPosX = windowRect.width + _label.width + _fieldWidth;
+        var sliderPosX = windowRect.width + _label.width + _field.width;
+        var windowYPos = windowRect.height * _yPosFactor;
+
+        //Magic numbers are all tested out factors so the coords fit into the window
+        _label = new Rect(labelPosX * 0.01f, windowYPos + _fieldOffset, _fieldWidth, _fieldHeight);
+        _field = new Rect(fieldPosX * 0.1f, windowYPos + _fieldOffset, _fieldWidth, _fieldHeight);
+        _slider = new Rect(sliderPosX * 0.25f, windowYPos + _fieldOffset, _sliderWidth, _fieldHeight);
+        return windowRect;
     }
 }

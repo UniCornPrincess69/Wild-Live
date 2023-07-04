@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 607e9e2b56343e349a1e272e9fba3f9c, type: 3}
-  m_Name: Resolution
+  m_Script: {fileID: 11500000, guid: bc300f91d7a5ef44f947bbf9ef76b06d, type: 3}
+  m_Name: DefaultTerrain
   m_EditorClassIdentifier: 
-  <Value>k__BackingField: 30
+  <MapSize>k__BackingField: 263
+  <Resolution>k__BackingField: 50
+  <TerrainPosition>k__BackingField: {x: 0, y: 0, z: 0}
+  <IncludeNoise>k__BackingField: 0
