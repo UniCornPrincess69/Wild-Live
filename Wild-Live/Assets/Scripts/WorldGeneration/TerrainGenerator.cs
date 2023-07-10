@@ -20,24 +20,15 @@ public class TerrainGenerator : MonoBehaviour
     private TerrainData _terrainData = null;
     
     [SerializeField]
-    private SOBool _isNoiseUsed = null;
-
-    [SerializeField]
-    private int _terrainSize = 0;
-
-    [SerializeField]
     private Material _material = null;
-
-    [SerializeField]
-    private SOInt _resolution = null;
-
+    
     [SerializeField, Range(0f, 40f)]
     private float _noiseIntensity = 0f;
     #endregion
 
     
 
-    private void Awake()
+    private void OnEnable()
     {
         _filter = GetComponent<MeshFilter>();
         _renderer = GetComponent<MeshRenderer>();
@@ -47,11 +38,25 @@ public class TerrainGenerator : MonoBehaviour
         _mesh.name = "TerrainMesh";
     }
 
+
     private void Update()
     {
         GenerateTerrain();
     }
-
+#if UNITY_EDITOR
+    public void EditorWorldGeneration(TerrainData terrain, Material defaultMat)
+    {
+        _terrainData = terrain;
+        _material = new Material(defaultMat);
+        _filter = GetComponent<MeshFilter>();
+        _renderer = GetComponent<MeshRenderer>();
+        _mesh = new();
+        _renderer.sharedMaterial = _material;
+        _filter.sharedMesh = _mesh;
+        _mesh.name = "Default Mesh";
+        GenerateTerrain();
+    }
+#endif
     private void GenerateTerrain()
     {
         var mapSize = _terrainData.MapSize;

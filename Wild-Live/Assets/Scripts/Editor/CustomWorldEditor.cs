@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using TMPro;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
-using Codice.CM.SEIDInfo;
 using Unity.VisualScripting;
 
 public class CustomWorldEditor : EditorWindow
@@ -20,6 +17,8 @@ public class CustomWorldEditor : EditorWindow
     private float _yPosFactor = 0.05f;
     private float _fieldOffset = 0f;
     private TerrainData _terrainData;
+    private Material _terrainMaterial;
+    private GameObject _generator = null;
 
     private EditorManager _editorManager;
     #endregion
@@ -35,13 +34,13 @@ public class CustomWorldEditor : EditorWindow
     #endregion
 
 
-  
 
     private void OnEnable()
     {
         _editorManager = EditorManager.Instance;
         _editorManager.WorldEditor = this;
         _terrainData = (TerrainData)EditorGUIUtility.Load("Assets/Resources/DefaultTerrain.asset");
+        _terrainMaterial = (Material)EditorGUIUtility.Load("Assets/Resources/DefaultTerrainMat.mat");
     }
 
     [MenuItem("Tools/World Editor")]
@@ -55,9 +54,9 @@ public class CustomWorldEditor : EditorWindow
 
     private void OnGUI()
     {
-            
+
         var windowRect = position;
-        
+
         _toolbarIndex = GUILayout.Toolbar(_toolbarIndex, _toolbar);
         if (_toolbarIndex == 0)
         {
@@ -68,7 +67,7 @@ public class CustomWorldEditor : EditorWindow
             GUILayout.Label("TEST");
         }
         //GUILayout.Label("Terrain Settings", EditorStyles.boldLabel);
-        
+
     }
 
 
@@ -91,12 +90,20 @@ public class CustomWorldEditor : EditorWindow
         GUILayout.BeginHorizontal();
         GUI.Label(_label, _settings[1]);
         _terrainData.Resolution = (int)EditorGUI.FloatField(_field, _terrainData.Resolution);
-        _terrainData.Resolution = (int)GUI.HorizontalSlider(_slider, _terrainData.Resolution, 100f, 1000f);
+        _terrainData.Resolution = (int)GUI.HorizontalSlider(_slider, _terrainData.Resolution, 100f, 255f);
         GUILayout.EndHorizontal();
 
         //GUILayout.Toggle
 
-        GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain");
+        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain"))
+        {
+            if (_generator != null) DestroyImmediate(_generator);
+            var clone = Instantiate(_generator = new GameObject("Editor Terrain Generator"), _terrainData.TerrainPosition, Quaternion.identity);
+            DestroyImmediate(clone);
+            _generator.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainMaterial);
+        }
+
+        //field offset needs to be reset, otherwise the field would move constantly downwards
         _fieldOffset = 0f;
     }
 
