@@ -63,6 +63,7 @@ public class TerrainGenerator : MonoBehaviour
         var resolution = _terrainData.Resolution;
         var position = _terrainData.TerrainPosition;
         var isNoiseUsed = _terrainData.IncludeNoise;
+        this.transform.position = position;
         _verts = new Vector3[resolution * resolution];
         _uvs = new Vector2[resolution * resolution];
         //*2 für die Anzahl an Triangles pro Quad

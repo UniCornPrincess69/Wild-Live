@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Unity.VisualScripting;
+using System;
 
 public class CustomWorldEditor : EditorWindow
 {
@@ -64,13 +65,26 @@ public class CustomWorldEditor : EditorWindow
         }
         else
         {
-            GUILayout.Label("TEST");
+            if (!_terrainData.IncludeNoise)
+            {
+                var noiseMessage = new Rect(windowRect.width * .35f, windowRect.height * .35f, windowRect.width, windowRect.height * .35f);
+                EditorGUI.LabelField(noiseMessage, new GUIContent("Please enable the noise toggle!"));
+            }
+            else DrawNoiseSettings(windowRect);
         }
         //GUILayout.Label("Terrain Settings", EditorStyles.boldLabel);
 
     }
 
+    private void DrawNoiseSettings(Rect windowRect)
+    {
+        throw new NotImplementedException();
+    }
 
+    /// <summary>
+    /// Drawing of the TerrainSettings window
+    /// </summary>
+    /// <param name="windowRect"></param>
     private void DrawTerrainSettings(Rect windowRect)
     {
         //.2f so the field only takes 20% of the window
@@ -92,8 +106,21 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.Resolution = (int)EditorGUI.FloatField(_field, _terrainData.Resolution);
         _terrainData.Resolution = (int)GUI.HorizontalSlider(_slider, _terrainData.Resolution, 100f, 255f);
         GUILayout.EndHorizontal();
-
-        //GUILayout.Toggle
+        _fieldOffset += _fieldHeight;
+        windowRect = GetFieldRects(windowRect);
+        GUILayout.BeginHorizontal();
+        var vectorRect = new Rect(windowRect.width * 0.01f, windowRect.height * _yPosFactor + _fieldOffset, 
+            windowRect.width * 0.8f, _fieldHeight);
+        _terrainData.TerrainPosition = EditorGUI.Vector3Field(vectorRect, _settings[2], _terrainData.TerrainPosition);
+        GUILayout.EndHorizontal();
+        _fieldOffset += _fieldHeight * 2;
+        windowRect = GetFieldRects(windowRect);
+        GUILayout.BeginHorizontal();
+        var boolRect = new Rect(windowRect.width * 0.17f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f),
+            windowRect.width * 0.05f, _fieldHeight);
+        GUI.Label(_label, _settings[3]);
+        _terrainData.IncludeNoise = EditorGUI.Toggle(boolRect, _terrainData.IncludeNoise);
+        GUILayout.EndHorizontal();
 
         if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain"))
         {
@@ -107,6 +134,11 @@ public class CustomWorldEditor : EditorWindow
         _fieldOffset = 0f;
     }
 
+    /// <summary>
+    /// Formular for the calculation of the Rects was taken from ChatGPT. I changed about 90% of it to fit my needs
+    /// </summary>
+    /// <param name="windowRect"></param>
+    /// <returns></returns>
     private Rect GetFieldRects(Rect windowRect)
     {
         var labelPosX = windowRect.width - _fieldWidth;

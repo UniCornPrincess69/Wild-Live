@@ -13,6 +13,7 @@ public class TerrainData :ScriptableObject
     public Vector3 TerrainPosition { get; set; } = Vector3.zero;
     [field: SerializeField]
     public bool IncludeNoise { get; set; } = false;
-
+    [field: SerializeField]
+    public float NoiseIntensity { get; set; } = 0f;
 
 }
