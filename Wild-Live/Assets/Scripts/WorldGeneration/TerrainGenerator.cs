@@ -54,11 +54,15 @@ public class TerrainGenerator : MonoBehaviour
         _renderer.sharedMaterial = _material;
         _filter.sharedMesh = _mesh;
         _mesh.name = "Default Mesh";
+        _terrainData.TerrainPosition = transform.position;
         GenerateTerrain();
     }
 #endif
     private void GenerateTerrain()
     {
+        var watch = new System.Diagnostics.Stopwatch();
+        watch.Start();
+
         var mapSize = _terrainData.MapSize;
         var resolution = _terrainData.Resolution;
         var position = _terrainData.TerrainPosition;
@@ -110,6 +114,8 @@ public class TerrainGenerator : MonoBehaviour
         _mesh.triangles = tris;
         _mesh.uv = _uvs;
         _mesh.RecalculateNormals();
+
+        watch.Stop();
     }
 
     //private void OnDrawGizmos()
