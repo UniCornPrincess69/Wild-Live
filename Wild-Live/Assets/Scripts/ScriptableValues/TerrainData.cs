@@ -15,5 +15,9 @@ public class TerrainData :ScriptableObject
     public bool IncludeNoise { get; set; } = false;
     [field: SerializeField]
     public float NoiseIntensity { get; set; } = 0f;
+    [field: SerializeField]
+    public Texture2D Heightmap { get; set; } = null;
+    [field: SerializeField]
+    public Material Material { get; set; } = null;
 
 }
