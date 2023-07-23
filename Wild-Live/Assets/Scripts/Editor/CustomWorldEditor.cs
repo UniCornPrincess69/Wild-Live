@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Unity.VisualScripting;
-using System;
-using UnityEngine.Rendering.UI;
-using Codice.CM.Client.Differences.Graphic;
 
 public class CustomWorldEditor : EditorWindow
 {
@@ -24,6 +21,7 @@ public class CustomWorldEditor : EditorWindow
     private TerrainData _terrainData;
     private GameObject _generator = null;
 
+    private EditorSave _saver = null;
     #endregion
 
 
@@ -42,7 +40,7 @@ public class CustomWorldEditor : EditorWindow
     {
         _terrainData = (TerrainData)EditorGUIUtility.Load("Assets/Resources/DefaultTerrain.asset");
         _terrainData.Material = (Material)EditorGUIUtility.Load("Assets/Resources/DefaultTerrainMat.mat");
-
+        _saver = new EditorSave();
         _generator = FindObjectOfType<TerrainGenerator>()?.gameObject;
 
         if (_generator != null)
@@ -95,7 +93,7 @@ public class CustomWorldEditor : EditorWindow
             EditorGUILayout.LabelField(new GUIContent("Created by Tommy Hartung"));
         }
         //GUILayout.Label("Terrain Settings", EditorStyles.boldLabel);
-
+        
     }
 
     private void DrawNoiseSettings(Rect windowRect)
@@ -144,7 +142,7 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.Material = StartField<Material>(_settings[4], _terrainData.Material, ref windowRect);
         
 
-        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain") || _useCheck)
+        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.90f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain") || _useCheck)
         {
             _useCheck = true;
             if (Selection.count == 1 && Selection.activeGameObject.TryGetComponent(out TerrainGenerator gen))
@@ -159,6 +157,15 @@ public class CustomWorldEditor : EditorWindow
                 _generator.transform.position = _terrainData.TerrainPosition;
                 _generator.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
             }
+        }
+
+        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height *0.95f, windowRect.width *0.45f, _fieldHeight), "Save"))
+        {
+            _saver.Save(_terrainData);
+        }
+        if (GUI.Button(new Rect(windowRect.width * 0.50f, windowRect.height * 0.95f, windowRect.width * 0.45f, _fieldHeight), "Load"))
+        {
+            _terrainData = _saver.Load<TerrainData>();
         }
 
         //field offset needs to be reset, otherwise the field would move constantly downwards
