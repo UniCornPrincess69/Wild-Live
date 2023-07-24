@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "DefaultTerrain", menuName = "ScriptableObjects/TerrainData")]
-public class TerrainData :ScriptableObject
+public class TerrainData : ScriptableObject
 {
     [field: SerializeField]
     public int MapSize { get; set; } = 100;
@@ -20,4 +21,16 @@ public class TerrainData :ScriptableObject
     [field: SerializeField]
     public Material Material { get; set; } = null;
 
+    public void SetData(TerrainSaveData saveData)
+    {
+        if (saveData == null) return; 
+        
+        MapSize = saveData.mapSize;
+        Resolution = saveData.resolution;
+        TerrainPosition = saveData.Position;
+        IncludeNoise = saveData.noiseIncluded;
+        NoiseIntensity = saveData.noiseIntensity;
+        Heightmap = saveData.heightmap;
+        Material = saveData.material;
+    }
 }

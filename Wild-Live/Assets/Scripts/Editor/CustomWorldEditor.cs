@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 
 public class CustomWorldEditor : EditorWindow
 {
+    //TODO: Using a boolean to know if the terrain is generated or the unity terrain is used!
     #region Variables
     private static readonly Vector2 _minSize = new Vector2(500f, 500f);
     private static readonly Vector2 _maxSize = new Vector2(800f, 800f);
@@ -21,7 +22,7 @@ public class CustomWorldEditor : EditorWindow
     private TerrainData _terrainData;
     private GameObject _generator = null;
 
-    private EditorSave _saver = null;
+    private EditorSaveSystem _saveSystem = null;
     #endregion
 
 
@@ -40,7 +41,7 @@ public class CustomWorldEditor : EditorWindow
     {
         _terrainData = (TerrainData)EditorGUIUtility.Load("Assets/Resources/DefaultTerrain.asset");
         _terrainData.Material = (Material)EditorGUIUtility.Load("Assets/Resources/DefaultTerrainMat.mat");
-        _saver = new EditorSave();
+        _saveSystem = new EditorSaveSystem();
         _generator = FindObjectOfType<TerrainGenerator>()?.gameObject;
 
         if (_generator != null)
@@ -161,11 +162,15 @@ public class CustomWorldEditor : EditorWindow
 
         if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height *0.95f, windowRect.width *0.45f, _fieldHeight), "Save"))
         {
-            _saver.Save(_terrainData);
+            var saveData = new TerrainSaveData(_terrainData);
+            _saveSystem.Save(saveData);
         }
         if (GUI.Button(new Rect(windowRect.width * 0.50f, windowRect.height * 0.95f, windowRect.width * 0.45f, _fieldHeight), "Load"))
         {
-            _terrainData = _saver.Load<TerrainData>();
+            //_terrainData = _saver.Load(_terrainData);
+            //_saver.Load<TerrainSaveData>(ref _terrainData);
+
+            _terrainData.SetData(_saveSystem.Load<TerrainSaveData>());
         }
 
         //field offset needs to be reset, otherwise the field would move constantly downwards
