@@ -12,8 +12,9 @@ public class WorldTime : MonoBehaviour
     private Transform _light = null;
     private float _lightRot = 50f;
     #endregion
-    void Start()
+    void Awake()
     {
+        GameWorldManager.Instance.WorldTime = this;
         _light = GetComponent<Transform>();
     }
 

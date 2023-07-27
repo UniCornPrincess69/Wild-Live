@@ -13,7 +13,7 @@ public class CustomWorldEditor : EditorWindow
     private static Rect _windowDefault = new(100, 50, 500, 500);
 
     private readonly string[] _toolbar = { "Terrain Settings", "Noise Settings", "About" };
-    private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise", "Material" };
+    private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise", "Material", "Use Terrain" };
     private readonly string[] _noiseSettings = { "Noise Intensity", "Height Map" };
     private int _toolbarIndex = 0;
     private float _yPosFactor = 0.05f;
@@ -136,6 +136,7 @@ public class CustomWorldEditor : EditorWindow
         _fieldHeight = EditorGUIUtility.singleLineHeight;
         windowRect = GetFieldRects(windowRect);
 
+        _terrainData.UseTerrain = StartField<bool>(_settings[5], _terrainData.UseTerrain, ref windowRect);
         _terrainData.MapSize = (int)StartField<float>(_settings[0], _terrainData.MapSize, ref windowRect, 100f, 5000f);
         _terrainData.Resolution = (int)StartField<float>(_settings[1], _terrainData.Resolution, ref windowRect, 100f, 255f);
         _terrainData.TerrainPosition = StartField<Vector3>(_settings[2], _terrainData.TerrainPosition, ref windowRect);

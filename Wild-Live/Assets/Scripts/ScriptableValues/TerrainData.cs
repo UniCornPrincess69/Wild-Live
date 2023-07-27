@@ -7,6 +7,8 @@ using UnityEngine;
 public class TerrainData : ScriptableObject
 {
     [field: SerializeField]
+    public bool UseTerrain { get; set; } = false;
+    [field: SerializeField]
     public int MapSize { get; set; } = 100;
     [field: SerializeField]
     public int Resolution { get; set; } = 50;

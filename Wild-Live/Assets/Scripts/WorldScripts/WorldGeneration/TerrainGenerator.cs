@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class TerrainGenerator : MonoBehaviour
     private Mesh _mesh = null;
     private Vector3[] _verts = null;
     private Vector2[] _uvs = null;
+    private Terrain _terrain = null;
     #endregion
 
     #region Serialized
@@ -32,10 +34,12 @@ public class TerrainGenerator : MonoBehaviour
     {
         _filter = GetComponent<MeshFilter>();
         _renderer = GetComponent<MeshRenderer>();
+        _terrain = GetComponent<Terrain>();
         _mesh = new();
         _renderer.sharedMaterial = _material;
         _filter.sharedMesh = _mesh;
         _mesh.name = "TerrainMesh";
+        GameWorldManager.Instance.TerrainGenerator = this;
     }
 
 
