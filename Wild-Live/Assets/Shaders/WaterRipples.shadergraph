@@ -11,6 +11,9 @@
         },
         {
             "m_Id": "3939b7d3fc7b4feea105353506c94fe1"
+        },
+        {
+            "m_Id": "72f236e9718a4bfd960ef16760e30ac4"
         }
     ],
     "m_Keywords": [],
@@ -818,6 +821,33 @@
 }
 
 {
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "72f236e9718a4bfd960ef16760e30ac4",
+    "m_Guid": {
+        "m_GuidSerialized": "5533559a-5fa8-451e-84a4-5d7fc5cb0e12"
+    },
+    "m_Name": "RippleIntensity",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "RippleIntensity",
+    "m_DefaultReferenceName": "_RippleIntensity",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": 0.0,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
+    }
+}
+
+{
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Texture2DInputMaterialSlot",
     "m_ObjectId": "76823b0aea744aedb9845396e974381d",
@@ -1040,6 +1070,9 @@
         },
         {
             "m_Id": "3939b7d3fc7b4feea105353506c94fe1"
+        },
+        {
+            "m_Id": "72f236e9718a4bfd960ef16760e30ac4"
         }
     ]
 }

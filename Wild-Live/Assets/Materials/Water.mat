@@ -26,7 +26,7 @@ Material:
   m_ValidKeywords:
   - _SPECULAR_SETUP
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2000
@@ -104,6 +104,7 @@ Material:
     - _BumpScale: 1
     - _CastShadows: 1
     - _CausticDensity: 0.525
+    - _CausticSpeed: 2
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -130,7 +131,7 @@ Material:
     - _SrcBlend: 1
     - _Surface: 0
     - _WaveFreq: 0.2
-    - _WaveIntensity: 20
+    - _WaveIntensity: 10
     - _WorkflowMode: 0
     - _ZTest: 4
     - _ZWrite: 1

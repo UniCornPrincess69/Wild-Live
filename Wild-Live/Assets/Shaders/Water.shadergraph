@@ -2760,7 +2760,7 @@
     "m_Value": 20.0,
     "m_FloatType": 1,
     "m_RangeValues": {
-        "x": 20.0,
+        "x": 10.0,
         "y": 50.0
     }
 }
@@ -5168,7 +5168,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "ac215e9a298b400ea62f5214b0072685",
     "m_Id": 0,
-    "m_DisplayName": "RippleSpeed",
+    "m_DisplayName": "CausticSpeed",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -6257,10 +6257,10 @@
     "m_Guid": {
         "m_GuidSerialized": "603c6058-bc06-44a9-b8be-baccc767ee25"
     },
-    "m_Name": "RippleSpeed",
+    "m_Name": "CausticSpeed",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "RippleSpeed",
-    "m_DefaultReferenceName": "_RippleSpeed",
+    "m_RefNameGeneratedByDisplayName": "CausticSpeed",
+    "m_DefaultReferenceName": "_CausticSpeed",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,

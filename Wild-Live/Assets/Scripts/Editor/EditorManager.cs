@@ -7,7 +7,7 @@ public class EditorManager : ScriptableSingleton<EditorManager>
 {
     public CustomWorldEditor WorldEditor { get; set; } = null;
 
-    private Dictionary<string, ScriptableValue> _terrainValues = null;
+    //private Dictionary<string, ScriptableValue> _terrainValues = null;
 
 
     //public int MapSize { get; set; } = 0;
