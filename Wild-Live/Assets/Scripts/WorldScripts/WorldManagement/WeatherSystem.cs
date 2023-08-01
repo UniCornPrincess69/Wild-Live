@@ -1,42 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks.Sources;
 using UnityEngine;
 using UnityEngine.VFX;
 
 public class WeatherSystem : MonoBehaviour
 {
     [SerializeField]
-    private Material _grass = null;
-    [SerializeField]
-    private Material _ground = null;
-    [SerializeField]
-    private Material _water = null;
-    [SerializeField]
-    private List<GameObject> _vfx = null;
+    private List<GameObject> _effects = null;
     [SerializeField]
     private List<string> _list = new List<string>();
 
     private WeatherCondition _previousCondition = WeatherCondition.None;
-    [SerializeField]
     private WeatherCondition _condition = WeatherCondition.None;
 
     [SerializeField]
     private WeatherValues _values = null;
 
-
     private int _rng = 0;
 
-    private Dictionary<WeatherCondition, Dictionary<string, float>> _conditions = null;
-    private Dictionary<string, dynamic> _stormy = null;
-    private Dictionary<string, dynamic> _clear = null;
-    private Dictionary<string, dynamic> _windy = null;
-    private Dictionary<string, dynamic> _rainy = null;
-
-
     private Dictionary<string, dynamic> _properties = null;
-
+    private FireValues fireValues = new FireValues();
 
     private enum WeatherCondition { Clear, Windy, Rainy, Stormy, None }
+
+    public event System.Action<FireValues> OnFireValuesChanged = val => { };
+
+
+    //Example from Stephan to have a "Dictionary" in the Inspector
+    //[System.Serializable] struct Pair<T1, T2> { [SerializeField] private string name; [SerializeField] private T1 first; [SerializeField] private T2 second; public T1 First => first; public T2 Second => second; }
+    //[SerializeField] private List<Pair<WeatherCondition, WeatherValues>> valuesList = new();
+    //private Dictionary<WeatherCondition, WeatherValues> values = new();
+
+    //private void OnEnable()
+    //{
+    //    for (int i = 0; i < valuesList.Count; i++)
+    //    {
+    //        values.Add(valuesList[i].First, valuesList[i].Second);
+    //    }
+
+    //    valuesList.Clear();
+    //}
 
 
     private void Awake()
@@ -45,11 +49,6 @@ public class WeatherSystem : MonoBehaviour
         _rng = Random.Range(0, 4);
         _condition = (WeatherCondition)_rng;
 
-        _stormy = new Dictionary<string, dynamic>()
-        {
-            { nameof(_values.WindStrength), _values.WindStrength },
-
-        };
         _properties = new Dictionary<string, dynamic>()
         {
             { _list[0], _values.WindStrength },
@@ -71,12 +70,14 @@ public class WeatherSystem : MonoBehaviour
     {
         _values.Wetness = 100f;
         ChangeWeather(_condition);
+
+        //testEffect.SetFloat("FlameRate", 1f);
     }
 
     private void Update()
     {
-
-
+        fireValues.FlameRate = Time.time;
+        OnFireValuesChanged.Invoke(fireValues);
     }
 
     [ContextMenu("WeatherChange")]
@@ -86,22 +87,28 @@ public class WeatherSystem : MonoBehaviour
 
         if (condition == WeatherCondition.Stormy) _values.ThunderIsPossible = true;
 
-        if (condition == WeatherCondition.Clear || condition == WeatherCondition.Windy &&
-            _previousCondition == WeatherCondition.Rainy || _previousCondition == WeatherCondition.Stormy)
+        if ((condition == WeatherCondition.Clear || condition == WeatherCondition.Windy) &&
+            (_previousCondition == WeatherCondition.Rainy || _previousCondition == WeatherCondition.Stormy))
         {
-            float timer = 0f;
-            float step = 0.02f;
-            while (_values.Wetness > 0f)
+            IEnumerator SwitchToDry()
             {
-                _values.Wetness = Mathf.Lerp(_values.Wetness, 0f, timer);
-                if (condition == WeatherCondition.Clear) _values.WindStrength = Mathf.Lerp(_values.WindStrength, 2.5f, timer);
-                else _values.WindStrength = Mathf.Lerp(_values.WindStrength, 10f, timer);
-                SetProperties();
-                timer += step;
+                float timer = 0f;
+                float step = 0.02f;
+                while (_values.Wetness > 0f)
+                {
+                    _values.Wetness = Mathf.Lerp(_values.Wetness, 0f, timer);
+                    if (condition == WeatherCondition.Clear) _values.WindStrength = Mathf.Lerp(_values.WindStrength, 2.5f, timer);
+                    else _values.WindStrength = Mathf.Lerp(_values.WindStrength, 10f, timer);
+                    SetProperties(null);
+                    timer += step;
+                    yield return null;
+                }
             }
 
+            StartCoroutine(SwitchToDry());
 
         }
+
 
         switch (condition)
         {
@@ -126,25 +133,25 @@ public class WeatherSystem : MonoBehaviour
 
             case WeatherCondition.Stormy:
                 _values.WindStrength = 10f;
-                _grass.SetFloat("_Wind_Strength", _values.WindStrength);
                 break;
         }
         Debug.Log(condition);
         _previousCondition = condition;
     }
 
-    [ContextMenu("SetProperties")]
-    private void SetProperties()
+    private void SetProperties(WeatherCondition con)
     {
         return;
     }
-
-
-    //TODO: Create all needed dictionaries. Property names via list
-    //Set properties in correlation to the dictionary
-    private Dictionary<dynamic, dynamic> CreateDictionary()
+    private void SetProperties(WeatherValues vals)
     {
-        var result = new Dictionary<dynamic, dynamic>();
-        return result;
+        //waterMat.SetFloat("_CausticDensity", vals.CausticDensity);
+
+        
+        
+        return;
     }
+
+    public FireValues GetFireValues() => fireValues;
+
 }
