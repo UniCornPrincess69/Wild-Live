@@ -13,6 +13,7 @@ public class TerraingenByStephan : MonoBehaviour
     [SerializeField] private bool generateTexture = false;
     [SerializeField] private int octaveCount = 1;
     [SerializeField] private float coordOffset = 0f;
+    
 
     private void Awake()
     {
@@ -37,7 +38,7 @@ public class TerraingenByStephan : MonoBehaviour
         float[,] heights = new float[size, size];
         Debug.Log(size);
 
-        for (int y = 0; y < size ; y++)
+        for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
             {
