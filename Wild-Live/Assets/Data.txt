@@ -1,0 +1,8 @@
+16 Chunks TIME: 62958 Ticks
+4 Chunks TIME: 153732 Ticks
+1 Chunk TIME: 466241 Ticks
+
+
+01 chunk(s) : 47,64ms
+04 chunk(s) : 16,45ms
+16 chunk(s) : 12,53ms

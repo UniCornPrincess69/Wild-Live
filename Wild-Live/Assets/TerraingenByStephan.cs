@@ -63,7 +63,7 @@ public class TerraingenByStephan : MonoBehaviour
     {
         //var xCoord = x / tex.width * scale + offset.x;
         //var yCoord = y / tex.height * scale + offset.y;
-        var xCoord = x / tex.width;
+        var xCoord = x / tex.width * 0.5f + coordOffset;
         var yCoord = y / tex.height * 0.5f + coordOffset;
 
         float noiseVal = 0f;

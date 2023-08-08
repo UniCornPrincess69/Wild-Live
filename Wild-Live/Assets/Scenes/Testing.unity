@@ -409,6 +409,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 152684888}
   m_CullTransparentMesh: 1
+--- !u!1 &156831576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 156831578}
+  - component: {fileID: 156831577}
+  m_Layer: 0
+  m_Name: NoiseGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &156831577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156831576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d8b8a2610af0604fac0b3c25a0cd119, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _terrains:
+  - {fileID: 1154690446}
+  - {fileID: 990136698}
+  - {fileID: 1049977890}
+  - {fileID: 737129807}
+  _texture: {fileID: 2800000, guid: 17949cf75ec6b0f48b385f6c893f8b87, type: 3}
+  _seed: Tommy
+  _octaveCount: 8
+  _scale: 4
+  _useHeightmap: 0
+  _heightMapIntensity: 0.1
+  _chunkAmount: 4
+  _noiseSize: 1025
+--- !u!4 &156831578
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156831576}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &402328885
 GameObject:
   m_ObjectHideFlags: 0
@@ -606,7 +663,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &473707465
 Transform:
   m_ObjectHideFlags: 0
@@ -831,12 +888,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texture: {fileID: 2800000, guid: 9136fbd304bec8d4eb8e3a1d1bb296f2, type: 3}
-  _seed: Liz
+  _seed: Tommy
   _offsetCoord: {x: 0.5, y: 0.5}
   _octaveCount: 8
   _scale: 4
   _useHeightmap: 0
   _heightMapIntensity: 0.1
+  _chunkAmount: 4
 --- !u!154 &737129806
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -1735,12 +1793,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texture: {fileID: 2800000, guid: 9136fbd304bec8d4eb8e3a1d1bb296f2, type: 3}
-  _seed: Liz
+  _seed: Tommy
   _offsetCoord: {x: 0.5, y: 0}
   _octaveCount: 8
   _scale: 4
   _useHeightmap: 0
   _heightMapIntensity: 0.1
+  _chunkAmount: 4
 --- !u!154 &990136697
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -1833,12 +1892,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texture: {fileID: 2800000, guid: 9136fbd304bec8d4eb8e3a1d1bb296f2, type: 3}
-  _seed: Liz
+  _seed: Tommy
   _offsetCoord: {x: 0, y: 0.5}
   _octaveCount: 8
   _scale: 4
   _useHeightmap: 0
   _heightMapIntensity: 0.1
+  _chunkAmount: 4
 --- !u!154 &1049977889
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -2151,12 +2211,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texture: {fileID: 2800000, guid: 9136fbd304bec8d4eb8e3a1d1bb296f2, type: 3}
-  _seed: Liz
+  _seed: Tommy
   _offsetCoord: {x: 0, y: 0}
   _octaveCount: 8
   _scale: 4
   _useHeightmap: 0
   _heightMapIntensity: 0.1
+  _chunkAmount: 4
 --- !u!218 &1154690446
 Terrain:
   m_ObjectHideFlags: 0
