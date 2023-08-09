@@ -37,6 +37,9 @@ public class CustomWorldEditor : EditorWindow
     #endregion
 
 
+    //TODO: Dropdown Menu for using heightmap values on top of noise or only heightmap
+    //TODO: Maybe implementing changing from plane to terrain
+
     private void OnEnable()
     {
         _terrainData = (TerrainData)EditorGUIUtility.Load("Assets/Resources/DefaultTerrain.asset");
@@ -94,11 +97,12 @@ public class CustomWorldEditor : EditorWindow
             EditorGUILayout.LabelField(new GUIContent("Created by Tommy Hartung"));
         }
         //GUILayout.Label("Terrain Settings", EditorStyles.boldLabel);
-        
+
     }
 
     private void DrawNoiseSettings(Rect windowRect)
     {
+        EditorGUI.BeginChangeCheck();
         //.3f so the label only takes 30% of the window
         _labelWidth = windowRect.width * 0.3f;
         //.1f so the field only takes 10% of the window
@@ -109,9 +113,15 @@ public class CustomWorldEditor : EditorWindow
         windowRect = GetFieldRects(windowRect);
 
         _terrainData.NoiseIntensity = (int)StartField<float>(_noiseSettings[0], _terrainData.NoiseIntensity,
-            ref windowRect, 0f, 20f);
+            ref windowRect, 1f, 2000f);
 
         _terrainData.Heightmap = StartField<Texture2D>(_noiseSettings[1], _terrainData.Heightmap, ref windowRect);
+
+        if (_useCheck)
+        {
+            _useCheck = true;
+            _generator.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
+        }
 
         //_terrainData.Heightmap = (Texture2D)EditorGUILayout.ObjectField("Heightmap", _terrainData.Heightmap,
         //    typeof(Texture2D), true);
@@ -142,7 +152,7 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.TerrainPosition = StartField<Vector3>(_settings[2], _terrainData.TerrainPosition, ref windowRect);
         _terrainData.IncludeNoise = StartField<bool>(_settings[3], _terrainData.IncludeNoise, ref windowRect);
         _terrainData.Material = StartField<Material>(_settings[4], _terrainData.Material, ref windowRect);
-        
+
 
         if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.90f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain") || _useCheck)
         {
@@ -161,7 +171,7 @@ public class CustomWorldEditor : EditorWindow
             }
         }
 
-        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height *0.95f, windowRect.width *0.45f, _fieldHeight), "Save"))
+        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.45f, _fieldHeight), "Save"))
         {
             var saveData = new TerrainSaveData(_terrainData);
             _saveSystem.Save(saveData);
@@ -213,13 +223,13 @@ public class CustomWorldEditor : EditorWindow
 
         GUILayout.BeginHorizontal();
 
-        if(value.GetType() == typeof(int))
+        if (value.GetType() == typeof(int))
         {
             GUI.Label(_label, label);
             value = EditorGUI.FloatField(_field, (int)value);
             if (parameters.Length == 2) value = GUI.HorizontalSlider(_slider, (float)value, (float)parameters[0], (float)parameters[1]);
         }
-        else if(value.GetType() == typeof(Vector3))
+        else if (value.GetType() == typeof(Vector3))
         {
             var vectorRect = new Rect(windowRect.width * 0.01f, windowRect.height * _yPosFactor + _fieldOffset,
                 windowRect.width * 0.8f, _fieldHeight);
@@ -227,20 +237,20 @@ public class CustomWorldEditor : EditorWindow
 
             lineCount = 2.5f;
         }
-        else if(value.GetType() == typeof(bool))
+        else if (value.GetType() == typeof(bool))
         {
             var boolRect = new Rect(windowRect.width * 0.17f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f),
             windowRect.width * 0.05f, _fieldHeight);
             GUI.Label(_label, label);
             value = EditorGUI.Toggle(boolRect, (bool)value);
         }
-        else if(value.GetType() == typeof(float))
+        else if (value.GetType() == typeof(float))
         {
             GUI.Label(_label, label);
             value = EditorGUI.FloatField(_field, (float)value);
             if (parameters.Length == 2) value = GUI.HorizontalSlider(_slider, (float)value, (float)parameters[0], (float)parameters[1]);
         }
-        else if(value.GetType() == typeof(Texture2D))
+        else if (value.GetType() == typeof(Texture2D))
         {
             GUI.Label(_label, label);
             var textureRect = new Rect(windowRect.width * 0.21f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f),
@@ -248,7 +258,7 @@ public class CustomWorldEditor : EditorWindow
             value = EditorGUI.ObjectField(textureRect, (UnityEngine.Object)value, typeof(Texture2D), true);
             lineCount = 3.5f;
         }
-        else if(value.GetType() == typeof(Material))
+        else if (value.GetType() == typeof(Material))
         {
             GUI.Label(_label, label);
             var materialRect = new Rect(windowRect.width * 0.15f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f),

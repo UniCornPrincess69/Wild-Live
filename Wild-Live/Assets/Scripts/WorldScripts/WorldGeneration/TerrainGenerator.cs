@@ -24,8 +24,8 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]
     private Material _material = null;
     
-    [SerializeField, Range(0f, 40f)]
-    private float _noiseIntensity = 0f;
+    //[SerializeField, Range(0f, 40f)]
+    //private float _noiseIntensity = 0f;
     #endregion
 
     
@@ -64,13 +64,13 @@ public class TerrainGenerator : MonoBehaviour
 #endif
     private void GenerateTerrain()
     {
-        var watch = new System.Diagnostics.Stopwatch();
-        watch.Start();
 
         var mapSize = _terrainData.MapSize;
         var resolution = _terrainData.Resolution;
         var position = _terrainData.TerrainPosition;
         var isNoiseUsed = _terrainData.IncludeNoise;
+        var noiseIntensity = _terrainData.NoiseIntensity;
+        float[,] noiseVals = default;
         this.transform.position = position;
         _verts = new Vector3[resolution * resolution];
         _uvs = new Vector2[resolution * resolution];
@@ -79,21 +79,23 @@ public class TerrainGenerator : MonoBehaviour
         int[] tris = new int[(resolution - 1) * (resolution - 1) * 2 * 3];
         Vector3 startPos = (Vector3.left + Vector3.back) * mapSize * 0.5f;
         int triIdx = 0;
+
+        if (isNoiseUsed)
+        {
+            noiseVals = EditorNoiseGen.GenerateNoiseMap(resolution, resolution, 8, 8);
+        }
+
         for (int y = 0, i = 0; y < resolution; y++)
         {
             for (int x = 0; x < resolution; x++, i++)
             {
-                float n = 0f;
-                if (isNoiseUsed)
-                {
-                    n = Mathf.PerlinNoise(x * .3f, y * .3f) * _noiseIntensity;
-                }
 
                 Vector2 percent = new Vector2(x, y) / (resolution - 1);
                 //Vector2 percent = new Vector2((float)x / (_resolution - 1), (float)y / (_resolution - 1));
                 Vector3 vertPos = startPos + (Vector3.right * percent.x + Vector3.forward * percent.y) * mapSize;
 
-                _verts[i] = new Vector3(vertPos.x, n, vertPos.z);
+                if (isNoiseUsed) _verts[i] = new Vector3(vertPos.x, noiseVals[x,y] * noiseIntensity, vertPos.z);
+                else _verts[i] = new Vector3(vertPos.x, 0, vertPos.z);
                 _uvs[i] = percent;
 
                 if (x < resolution - 1 && y < resolution - 1)
@@ -119,16 +121,6 @@ public class TerrainGenerator : MonoBehaviour
         _mesh.uv = _uvs;
         _mesh.RecalculateNormals();
 
-        watch.Stop();
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    if (_verts == null) return;
-
-    //    for (int i = 0; i < _verts.Length; i++)
-    //    {
-    //        Gizmos.DrawSphere(_verts[i], .1f);
-    //    }
-    //}
 }

@@ -16,6 +16,7 @@ public class CustomNoise : MonoBehaviour
     [SerializeField, Range(0.1f, 1.0f)] private float _heightMapIntensity = 0.1f;
     [SerializeField] private int _chunkAmount = 1;
     [SerializeField] private int _noiseSize = 1025;
+    [SerializeField] private bool _generateTexture = false;
 
     private Vector2 _offset = Vector2.zero;
     private float[,] _noise = null;
@@ -26,28 +27,31 @@ public class CustomNoise : MonoBehaviour
         _offset = new Vector2(Random.Range(0, 100_000), Random.Range(0, 100_000));
         _noise = GenerateWorldNoise();
 
-        //foreach (var terrain in _terrains)
-        //{
-            //terrain.GetComponent<TerrainGeneration>().GenerateTerrain(_noise);
-        //}
-
-        for (int i = 0; i < _terrains.Count; i++)
+        foreach (var terrain in _terrains)
         {
-            _terrains[i].GetComponent<TerrainGeneration>().GenerateTerrain(_noise);
+            terrain.GetComponent<TerrainGeneration>().GenerateTerrain(_noise);
         }
 
-        for (int x = 0; x < _noiseSize; x++)
+        //Mainly for debugging purposes to get a visual noise map texture
+        if (_generateTexture)
         {
-            for (int y = 0; y < _noiseSize; y++)
+            for (int x = 0; x < _noiseSize; x++)
             {
-                var colVal = _noise[x, y];
-                var color = new Color(colVal, colVal, colVal, 1);
-                _texture.SetPixel(x, y, color);
+                for (int y = 0; y < _noiseSize; y++)
+                {
+                    var colVal = _noise[x, y];
+                    var color = new Color(colVal, colVal, colVal, 1);
+                    _texture.SetPixel(x, y, color);
+                }
             }
+            _texture.Apply();
         }
-        _texture.Apply();
     }
 
+    /// <summary>
+    /// Generation of the world noise map. Returns float[,]
+    /// </summary>
+    /// <returns>float[,] with the world noise values</returns>
     private float[,] GenerateWorldNoise()
     {
         var chunkSize = _noiseSize / _chunkAmount;
@@ -63,8 +67,8 @@ public class CustomNoise : MonoBehaviour
             {
                 var minX = (int)chunk.x * x;
                 var minY = (int)chunk.y * y;
-                var maxX = minX + chunkSize;
-                var maxY = minY + chunkSize;
+                var maxX = minX + chunkSize + 1;
+                var maxY = minY + chunkSize + 1;
 
                 //GenerateWorldNoise(_scale, minX, minY, maxX, maxY, ref noise);
                 var thread = new Thread(() =>
@@ -79,43 +83,32 @@ public class CustomNoise : MonoBehaviour
 
         System.Diagnostics.Stopwatch _watch = System.Diagnostics.Stopwatch.StartNew();
 
-        bool threadsAreWorking = true;
-        //while (threadsAreWorking)
-        //{
-        //    threadsAreWorking = false;
-        //    for (int i = 0; i < threads.Count; i++)
-        //    {
-        //        if (threads[i].IsAlive)
-        //        {
-        //            threadsAreWorking = true;
-        //            break;
-        //        }
-        //    }
-        //}
         while (threads.Count > 0)
         {
 
         }
 
         Profiler.EndSample();
-        //Debug.Log($"TIME: {_watch.ElapsedTicks} Ticks");
-
-
-
         return noise;
     }
 
+    /// <summary>
+    /// Generation of the world noise, divided into chunks. So it can be multithreaded
+    /// </summary>
+    /// <param name="minX">Chunk start pos for X</param>
+    /// <param name="maxX">Chunk end pos for X</param>
+    /// <param name="minY">Chunk start pos for Y</param>
+    /// <param name="maxY">Chunk end pos for Y</param>
+    /// <param name="noise">Ref to noise to set the height/noise values</param>
     private void GenerateWorldNoise(int minX, int maxX, int minY, int maxY, ref float[,] noise)
     {
-        //Debug.Log($"{minX},{maxX},{minY},{maxY}");
 
         System.Diagnostics.Stopwatch _watch = System.Diagnostics.Stopwatch.StartNew();
 
-        //Debug.Log(Thread.CurrentThread.ManagedThreadId);
 
-        for (int x = minX; x <= maxX; x++)
+        for (int x = minX; x < maxX; x++)
         {
-            for (int y = minY; y <= maxY; y++)
+            for (int y = minY; y < maxY; y++)
             {
                 var xCoord = (float)x / _noiseSize;
                 var yCoord = (float)y / _noiseSize;
@@ -134,7 +127,7 @@ public class CustomNoise : MonoBehaviour
                 }
 
                 noiseVal /= maxHeight;
-                noise[x,y] = noiseVal;
+                noise[x, y] = noiseVal;
             }
         }
 
