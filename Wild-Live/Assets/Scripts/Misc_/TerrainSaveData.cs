@@ -12,6 +12,7 @@ public class TerrainSaveData
     public float noiseIntensity = -1.0f;
     public Texture2D heightmap = null;
     public Material material = null;
+    public bool isHeightmapUsed = false;
 
     public Vector3 Position => new Vector3(positions[0], positions[1], positions[2]);
 
@@ -29,5 +30,6 @@ public class TerrainSaveData
         noiseIntensity = data.NoiseIntensity;
         heightmap = data.Heightmap;
         material = data.Material;
+        isHeightmapUsed = data.HeightmapUsed;
     }
 }

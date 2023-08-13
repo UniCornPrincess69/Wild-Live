@@ -6,15 +6,14 @@ using Unity.VisualScripting;
 
 public class CustomWorldEditor : EditorWindow
 {
-    //TODO: Using a boolean to know if the terrain is generated or the unity terrain is used!
     #region Variables
     private static readonly Vector2 _minSize = new Vector2(500f, 500f);
     private static readonly Vector2 _maxSize = new Vector2(800f, 800f);
     private static Rect _windowDefault = new(100, 50, 500, 500);
 
     private readonly string[] _toolbar = { "Terrain Settings", "Noise Settings", "About" };
-    private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise", "Material", "Use Terrain" };
-    private readonly string[] _noiseSettings = { "Noise Intensity", "Height Map" };
+    private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise", "Material" };
+    private readonly string[] _noiseSettings = { "Noise Intensity", "Height Map", "Use Heightmap?" };
     private int _toolbarIndex = 0;
     private float _yPosFactor = 0.05f;
     private float _fieldOffset = 0f;
@@ -38,8 +37,8 @@ public class CustomWorldEditor : EditorWindow
 
 
     //TODO: Dropdown Menu for using heightmap values on top of noise or only heightmap
-    //TODO: Maybe implementing changing from plane to terrain
 
+    //Loading of the default material and the scriptable object for Terrain data storage
     private void OnEnable()
     {
         _terrainData = (TerrainData)EditorGUIUtility.Load("Assets/Resources/DefaultTerrain.asset");
@@ -100,6 +99,10 @@ public class CustomWorldEditor : EditorWindow
 
     }
 
+    /// <summary>
+    /// Draw the tab with the noise settings
+    /// </summary>
+    /// <param name="windowRect">Rect of the complete window</param>
     private void DrawNoiseSettings(Rect windowRect)
     {
         EditorGUI.BeginChangeCheck();
@@ -115,7 +118,14 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.NoiseIntensity = (int)StartField<float>(_noiseSettings[0], _terrainData.NoiseIntensity,
             ref windowRect, 1f, 2000f);
 
+        if (_terrainData.HeightmapUsed = StartField<bool>(_noiseSettings[2], _terrainData.HeightmapUsed, ref windowRect))
+        {
+            GUI.enabled = true;
+        }
+        else GUI.enabled = false;
+
         _terrainData.Heightmap = StartField<Texture2D>(_noiseSettings[1], _terrainData.Heightmap, ref windowRect);
+        GUI.enabled = true;
 
         if (_useCheck)
         {
@@ -123,8 +133,6 @@ public class CustomWorldEditor : EditorWindow
             _generator.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
         }
 
-        //_terrainData.Heightmap = (Texture2D)EditorGUILayout.ObjectField("Heightmap", _terrainData.Heightmap,
-        //    typeof(Texture2D), true);
 
         _fieldOffset = 0f;
     }
@@ -132,7 +140,7 @@ public class CustomWorldEditor : EditorWindow
     /// <summary>
     /// Drawing of the TerrainSettings window
     /// </summary>
-    /// <param name="windowRect"></param>
+    /// <param name="windowRect">Rect of the complete window</param>
     private void DrawTerrainSettings(Rect windowRect)
     {
         EditorGUI.BeginChangeCheck();
@@ -146,12 +154,11 @@ public class CustomWorldEditor : EditorWindow
         _fieldHeight = EditorGUIUtility.singleLineHeight;
         windowRect = GetFieldRects(windowRect);
 
-        _terrainData.UseTerrain = StartField<bool>(_settings[5], _terrainData.UseTerrain, ref windowRect);
         _terrainData.MapSize = (int)StartField<float>(_settings[0], _terrainData.MapSize, ref windowRect, 100f, 5000f);
         _terrainData.Resolution = (int)StartField<float>(_settings[1], _terrainData.Resolution, ref windowRect, 100f, 255f);
         _terrainData.TerrainPosition = StartField<Vector3>(_settings[2], _terrainData.TerrainPosition, ref windowRect);
-        _terrainData.IncludeNoise = StartField<bool>(_settings[3], _terrainData.IncludeNoise, ref windowRect);
         _terrainData.Material = StartField<Material>(_settings[4], _terrainData.Material, ref windowRect);
+        _terrainData.IncludeNoise = StartField<bool>(_settings[3], _terrainData.IncludeNoise, ref windowRect);
 
 
         if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.90f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain") || _useCheck)
@@ -239,7 +246,7 @@ public class CustomWorldEditor : EditorWindow
         }
         else if (value.GetType() == typeof(bool))
         {
-            var boolRect = new Rect(windowRect.width * 0.17f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f),
+            var boolRect = new Rect(windowRect.width * 0.21f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f),
             windowRect.width * 0.05f, _fieldHeight);
             GUI.Label(_label, label);
             value = EditorGUI.Toggle(boolRect, (bool)value);

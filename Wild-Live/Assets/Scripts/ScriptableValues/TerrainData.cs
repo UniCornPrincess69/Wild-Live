@@ -7,8 +7,6 @@ using UnityEngine;
 public class TerrainData : ScriptableObject
 {
     [field: SerializeField]
-    public bool UseTerrain { get; set; } = false;
-    [field: SerializeField]
     public int MapSize { get; set; } = 100;
     [field: SerializeField]
     public int Resolution { get; set; } = 50;
@@ -22,6 +20,8 @@ public class TerrainData : ScriptableObject
     public Texture2D Heightmap { get; set; } = null;
     [field: SerializeField]
     public Material Material { get; set; } = null;
+    [field: SerializeField]
+    public bool HeightmapUsed { get; set; } = false;
 
     public void SetData(TerrainSaveData saveData)
     {
@@ -34,5 +34,6 @@ public class TerrainData : ScriptableObject
         NoiseIntensity = saveData.noiseIntensity;
         Heightmap = saveData.heightmap;
         Material = saveData.material;
+        HeightmapUsed = saveData.isHeightmapUsed;
     }
 }
