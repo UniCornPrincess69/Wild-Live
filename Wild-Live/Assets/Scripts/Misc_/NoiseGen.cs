@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 public static class EditorNoiseGen
 {
-    public static float[,] GenerateNoiseMap(int width, int height, float scale, float octaves)
+    public static float[,] GenerateNoiseMap(int width, int height, float scale, float octaves, Vector2 offset)
     {
         float[,] noiseMap = new float[width, height];
 
@@ -25,7 +25,7 @@ public static class EditorNoiseGen
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    noiseVal += Mathf.PerlinNoise(xCoord * scale, yCoord * scale) * intensity;
+                    noiseVal += Mathf.PerlinNoise(xCoord * scale + offset.x, yCoord * scale + offset.y) * intensity;
                     maxHeight += intensity;
                     intensity *= 0.5f;
                     noiseScale *= 2f;

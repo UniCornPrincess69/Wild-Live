@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -15,6 +14,8 @@ public class TerrainGenerator : MonoBehaviour
     private Vector3[] _verts = null;
     private Vector2[] _uvs = null;
     private Terrain _terrain = null;
+    private string _seed = string.Empty;
+    private Vector2 _offset = Vector2.zero;
     #endregion
 
     #region Serialized
@@ -50,6 +51,7 @@ public class TerrainGenerator : MonoBehaviour
 #if UNITY_EDITOR
     public void EditorWorldGeneration(TerrainData terrain, Material defaultMat)
     {
+        
         _terrainData = terrain;
         _material = new Material(defaultMat);
         _filter = GetComponent<MeshFilter>();
@@ -59,11 +61,14 @@ public class TerrainGenerator : MonoBehaviour
         _filter.sharedMesh = _mesh;
         _mesh.name = "Default Mesh";
         _terrainData.TerrainPosition = transform.position;
+        _seed = _terrainData.Seed;
         GenerateTerrain();
     }
 #endif
     private void GenerateTerrain()
     {
+        Random.InitState(_seed.GetHashCode());
+        _offset = new Vector2(Random.Range(0f, 9_999f), Random.Range(0f, 9_999f));
 
         var mapSize = _terrainData.MapSize;
         var resolution = _terrainData.Resolution;
@@ -82,7 +87,7 @@ public class TerrainGenerator : MonoBehaviour
 
         if (isNoiseUsed)
         {
-            noiseVals = EditorNoiseGen.GenerateNoiseMap(resolution, resolution, 8, 8);
+            noiseVals = EditorNoiseGen.GenerateNoiseMap(resolution, resolution, 8, 8, _offset);
         }
 
         for (int y = 0, i = 0; y < resolution; y++)

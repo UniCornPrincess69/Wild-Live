@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_EDITOR
-public class EditorManager : ScriptableSingleton<EditorManager>
+public class EditorManager
 {
     public CustomWorldEditor WorldEditor { get; set; } = null;
 

@@ -16,3 +16,8 @@ MonoBehaviour:
   <Resolution>k__BackingField: 172
   <TerrainPosition>k__BackingField: {x: 0, y: 0, z: 0}
   <IncludeNoise>k__BackingField: 0
+  <NoiseIntensity>k__BackingField: 1
+  <Heightmap>k__BackingField: {fileID: 0}
+  <Material>k__BackingField: {fileID: 2100000, guid: 8a82687ee95d1214b94dbfcb40b5530b,
+    type: 2}
+  <HeightmapUsed>k__BackingField: 0

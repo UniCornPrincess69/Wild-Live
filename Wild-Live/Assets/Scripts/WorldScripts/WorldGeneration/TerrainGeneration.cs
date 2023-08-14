@@ -13,8 +13,6 @@ public class TerrainGeneration : MonoBehaviour
     private int _terrainSize = 0;
     private Vector2 _terrainPos = Vector2.zero; 
 
-
-
     private void Awake()
     {
         _terrain = GetComponent<Terrain>();

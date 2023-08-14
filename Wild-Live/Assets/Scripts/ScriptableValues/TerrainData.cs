@@ -22,6 +22,8 @@ public class TerrainData : ScriptableObject
     public Material Material { get; set; } = null;
     [field: SerializeField]
     public bool HeightmapUsed { get; set; } = false;
+    [field: SerializeField]
+    public string Seed { get; set; } = string.Empty;
 
     public void SetData(TerrainSaveData saveData)
     {

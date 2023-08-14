@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Unity.VisualScripting;
+using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer;
+using UnityEditor.UIElements;
 
 public class CustomWorldEditor : EditorWindow
 {
@@ -12,16 +14,19 @@ public class CustomWorldEditor : EditorWindow
     private static Rect _windowDefault = new(100, 50, 500, 500);
 
     private readonly string[] _toolbar = { "Terrain Settings", "Noise Settings", "About" };
-    private readonly string[] _settings = { "Map Size", "Resolution", "Terrain Position", "Include noise", "Material" };
-    private readonly string[] _noiseSettings = { "Noise Intensity", "Height Map", "Use Heightmap?" };
+    private readonly string[] _settings = { "Map Size", "Resolution", "Spawn Position", "Include noise", "Material" };
+    private readonly string[] _noiseSettings = { "Noise Intensity", "Height Map", "Use Heightmap?", "Noise Seed" };
     private int _toolbarIndex = 0;
     private float _yPosFactor = 0.05f;
     private float _fieldOffset = 0f;
     private bool _useCheck = false;
     private TerrainData _terrainData;
     private GameObject _generator = null;
-
+    private GameObject _selected = null;
+    private int _selectionCount = 0;
     private EditorSaveSystem _saveSystem = null;
+
+
     #endregion
 
 
@@ -35,7 +40,6 @@ public class CustomWorldEditor : EditorWindow
     private Rect _label = default;
     #endregion
 
-
     //TODO: Dropdown Menu for using heightmap values on top of noise or only heightmap
 
     //Loading of the default material and the scriptable object for Terrain data storage
@@ -45,6 +49,15 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.Material = (Material)EditorGUIUtility.Load("Assets/Resources/DefaultTerrainMat.mat");
         _saveSystem = new EditorSaveSystem();
         _generator = FindObjectOfType<TerrainGenerator>()?.gameObject;
+        var terrains = FindObjectsOfType<TerrainGenerator>();
+        if (terrains.Length > 1)
+        {
+            _selected = terrains[0].gameObject;
+            for (int i = 1; i < terrains.Length; i++)
+            {
+                DestroyImmediate(terrains[i].gameObject);
+            }
+        }
 
         if (_generator != null)
         {
@@ -54,6 +67,9 @@ public class CustomWorldEditor : EditorWindow
             }
             else
             {
+                _terrainData.TerrainPosition = Vector3.zero;
+                _terrainData.MapSize = 1000;
+                _terrainData.Resolution = 200;
                 DestroyImmediate(_generator);
             }
         }
@@ -74,7 +90,6 @@ public class CustomWorldEditor : EditorWindow
     private void OnGUI()
     {
         var windowRect = position;
-
         _toolbarIndex = GUILayout.Toolbar(_toolbarIndex, _toolbar);
         if (_toolbarIndex == 0)
         {
@@ -112,8 +127,10 @@ public class CustomWorldEditor : EditorWindow
         _fieldWidth = windowRect.width * 0.1f;
         //.6f so the field only takes 60% of the window
         _sliderWidth = windowRect.width * 0.60f;
-        _fieldHeight = EditorGUIUtility.singleLineHeight;
+        _fieldHeight = EditorGUIUtility.singleLineHeight + 0.25f;
         windowRect = GetFieldRects(windowRect);
+
+        _terrainData.Seed = StartField<string>(_noiseSettings[3], _terrainData.Seed, ref windowRect);
 
         _terrainData.NoiseIntensity = (int)StartField<float>(_noiseSettings[0], _terrainData.NoiseIntensity,
             ref windowRect, 1f, 2000f);
@@ -127,13 +144,12 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.Heightmap = StartField<Texture2D>(_noiseSettings[1], _terrainData.Heightmap, ref windowRect);
         GUI.enabled = true;
 
+        
+
         if (_useCheck)
         {
-            _useCheck = true;
-            _generator.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
+            _selected.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
         }
-
-
         _fieldOffset = 0f;
     }
 
@@ -159,25 +175,9 @@ public class CustomWorldEditor : EditorWindow
         _terrainData.TerrainPosition = StartField<Vector3>(_settings[2], _terrainData.TerrainPosition, ref windowRect);
         _terrainData.Material = StartField<Material>(_settings[4], _terrainData.Material, ref windowRect);
         _terrainData.IncludeNoise = StartField<bool>(_settings[3], _terrainData.IncludeNoise, ref windowRect);
+        _fieldOffset = 0f;
 
-
-        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.90f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain") || _useCheck)
-        {
-            _useCheck = true;
-            if (Selection.count == 1 && Selection.activeGameObject.TryGetComponent(out TerrainGenerator gen))
-            {
-                _useCheck = true;
-                gen.EditorWorldGeneration(_terrainData, _terrainData.Material);
-            }
-            else
-            {
-                if (_generator != null) DestroyImmediate(_generator);
-                _generator = new GameObject("Editor Terrain Generator");
-                _generator.transform.position = _terrainData.TerrainPosition;
-                _generator.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
-            }
-        }
-
+        
         if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.95f, windowRect.width * 0.45f, _fieldHeight), "Save"))
         {
             var saveData = new TerrainSaveData(_terrainData);
@@ -190,6 +190,24 @@ public class CustomWorldEditor : EditorWindow
 
             _terrainData.SetData(_saveSystem.Load<TerrainSaveData>());
         }
+
+        if (GUI.Button(new Rect(windowRect.width * 0.05f, windowRect.height * 0.90f, windowRect.width * 0.9f, _fieldHeight), "Generate Terrain") || _useCheck)
+        {
+            _useCheck = true;
+            if (_selectionCount == 1 && _selected.TryGetComponent(out TerrainGenerator gen))
+            {
+                //_useCheck = true;
+                gen.EditorWorldGeneration(_terrainData, _terrainData.Material);
+            }
+            else
+            {
+                if (_generator != null) DestroyImmediate(_generator);
+                if (_selected == null) _selected = new GameObject("Editor Terrain Generator");
+                _selected.transform.position = _terrainData.TerrainPosition;
+                _selected.GetOrAddComponent<TerrainGenerator>().EditorWorldGeneration(_terrainData, _terrainData.Material);
+            }
+        }
+
 
         //field offset needs to be reset, otherwise the field would move constantly downwards
         _fieldOffset = 0f;
@@ -272,6 +290,12 @@ public class CustomWorldEditor : EditorWindow
             windowRect.width * 0.80f, _fieldHeight);
             value = EditorGUI.ObjectField(materialRect, (UnityEngine.Object)value, typeof(Material), true);
         }
+        else if (value.GetType() == typeof(string))
+        {
+            GUI.Label(_label, label);
+            var seedRect = new Rect(windowRect.width * 0.21f, windowRect.height * _yPosFactor + (_fieldOffset + 0.6f), windowRect.width * 0.40f, _fieldHeight);
+            value = EditorGUI.TextField(seedRect, (string)value);
+        }
 
         GUILayout.EndHorizontal();
 
@@ -279,5 +303,17 @@ public class CustomWorldEditor : EditorWindow
         windowRect = GetFieldRects(windowRect);
 
         return (T)value;
+    }
+
+    private void OnSelectionChange()
+    {
+        if (Selection.activeGameObject == null) return;
+        if (Selection.activeGameObject.TryGetComponent(out TerrainGenerator gen))
+        {
+            _selected = Selection.activeGameObject;
+        }
+        
+        //if(Selection.activeGameObject)_selected = Selection.activeGameObject;
+        if(Selection.count > 0) _selectionCount = Selection.count;
     }
 }
